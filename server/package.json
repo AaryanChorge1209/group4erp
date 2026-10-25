@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "cd ../client && npm install && npm run build && cd ../server && prisma generate && prisma db push && node prisma/seed.js",
+    "build": "cd ../client && npm install --include=dev && npm run build && cd ../server && npx prisma generate && npx prisma db push && node prisma/seed.js",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name init",
@@ -24,10 +24,10 @@
     "mammoth": "^1.8.0",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
-    "pdf-parse": "^1.1.1"
+    "pdf-parse": "^1.1.1",
+    "prisma": "^5.22.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7",
-    "prisma": "^5.22.0"
+    "nodemon": "^3.1.7"
   }
 }
