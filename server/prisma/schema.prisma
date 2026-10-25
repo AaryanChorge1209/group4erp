@@ -1,0 +1,368 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  role          String   // ADMIN, LIBRARIAN, STUDENT, PLACEMENT_OFFICER, COMPANY, ALUMNI
+  avatar        String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  student       Student?
+  staff         Staff?
+  alumni        Alumni?
+  companyUser   CompanyUser?
+  notifications Notification[]
+  auditLogs     AuditLog[]
+}
+
+model Student {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+  rollNumber  String  @unique
+  branch      String  // CSE, ECE, MECH, CIVIL, EEE, IT, MBA
+  batch       Int     // e.g. 2022
+  semester    Int     @default(1)
+  cgpa        Float   @default(0)
+  backlogs    Int     @default(0)
+  phone       String?
+  address     String?
+  skills      String? // JSON array as string
+  resumeUrl   String?
+
+  issues         BookIssue[]
+  fines          Fine[]
+  reservations   Reservation[]
+  applications   Application[]
+  parsedResume   ParsedResume?
+  mentorRequests MentorshipRequest[] @relation("StudentRequests")
+}
+
+model Staff {
+  id           String @id @default(cuid())
+  userId       String @unique
+  user         User   @relation(fields: [userId], references: [id])
+  department   String
+  designation  String
+  employeeId   String @unique
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String   // INFO, WARNING, SUCCESS, ERROR
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  meta      String?  // JSON
+  createdAt DateTime @default(now())
+}
+
+model AppSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ============ LIBRARY MODULE ============
+
+model Book {
+  id            String   @id @default(cuid())
+  title         String
+  author        String
+  isbn          String   @unique
+  category      String
+  publisher     String?
+  edition       String?
+  language      String   @default("English")
+  description   String?
+  coverUrl      String?
+  shelfLocation String?
+  totalCopies   Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  copies        BookCopy[]
+  reservations  Reservation[]
+}
+
+model BookCopy {
+  id              String   @id @default(cuid())
+  bookId          String
+  book            Book     @relation(fields: [bookId], references: [id])
+  barcode         String   @unique
+  rfidTag         String?
+  status          String   @default("AVAILABLE") // AVAILABLE, ISSUED, RESERVED, LOST
+  condition       String   @default("GOOD") // GOOD, FAIR, POOR, DAMAGED
+  acquisitionDate DateTime @default(now())
+
+  issues          BookIssue[]
+}
+
+model BookIssue {
+  id           String    @id @default(cuid())
+  bookCopyId   String
+  bookCopy     BookCopy  @relation(fields: [bookCopyId], references: [id])
+  studentId    String
+  student      Student   @relation(fields: [studentId], references: [id])
+  issuedAt     DateTime  @default(now())
+  dueDate      DateTime
+  returnedAt   DateTime?
+  issuedById   String
+  returnedById String?
+
+  fine         Fine?
+}
+
+model Fine {
+  id            String    @id @default(cuid())
+  bookIssueId   String    @unique
+  bookIssue     BookIssue @relation(fields: [bookIssueId], references: [id])
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id])
+  amount        Float
+  daysOverdue   Int
+  isPaid        Boolean   @default(false)
+  paidAt        DateTime?
+  isWaived      Boolean   @default(false)
+  waivedAt      DateTime?
+  waivedById    String?
+  receiptNumber String?   @unique
+  createdAt     DateTime  @default(now())
+}
+
+model Reservation {
+  id            String    @id @default(cuid())
+  bookId        String
+  book          Book      @relation(fields: [bookId], references: [id])
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id])
+  queuePosition Int
+  status        String    @default("PENDING") // PENDING, NOTIFIED, FULFILLED, CANCELLED, EXPIRED
+  notifiedAt    DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+model DigitalResource {
+  id          String   @id @default(cuid())
+  title       String
+  author      String?
+  category    String
+  type        String   // EBOOK, JOURNAL, PAPER
+  fileUrl     String
+  fileSize    Int?
+  description String?
+  uploadedBy  String
+  downloads   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+// ============ PLACEMENT & ALUMNI MODULE ============
+
+model Company {
+  id           String   @id @default(cuid())
+  name         String
+  industry     String
+  website      String?
+  email        String
+  phone        String?
+  description  String?
+  logoUrl      String?
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  registeredBy String?
+  createdAt    DateTime @default(now())
+
+  users        CompanyUser[]
+  drives       PlacementDrive[]
+}
+
+model CompanyUser {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+}
+
+model PlacementDrive {
+  id              String   @id @default(cuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id])
+  role            String
+  ctc             Float
+  driveDate       DateTime
+  venue           String?
+  mode            String   @default("OFFLINE") // ONLINE, OFFLINE, HYBRID
+  lastDateApply   DateTime
+  minCgpa         Float    @default(0)
+  maxBacklogs     Int      @default(0)
+  allowedBranches String   // JSON array
+  batchYear       Int
+  status          String   @default("UPCOMING") // UPCOMING, ONGOING, COMPLETED, CANCELLED
+  description     String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+
+  applications    Application[]
+  rounds          InterviewRound[]
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  driveId     String
+  drive       PlacementDrive @relation(fields: [driveId], references: [id])
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id])
+  status      String   @default("APPLIED") // APPLIED, SHORTLISTED, INTERVIEW_SCHEDULED, SELECTED, REJECTED, OFFER_ACCEPTED, WITHDRAWN
+  appliedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  notes       String?
+
+  roundResults RoundResult[]
+
+  @@unique([driveId, studentId])
+}
+
+model InterviewRound {
+  id          String   @id @default(cuid())
+  driveId     String
+  drive       PlacementDrive @relation(fields: [driveId], references: [id])
+  roundNumber Int
+  roundType   String   // APTITUDE, TECHNICAL, HR, GD
+  scheduledAt DateTime?
+  venue       String?
+  notes       String?
+
+  results     RoundResult[]
+}
+
+model RoundResult {
+  id            String   @id @default(cuid())
+  roundId       String
+  round         InterviewRound @relation(fields: [roundId], references: [id])
+  applicationId String
+  application   Application    @relation(fields: [applicationId], references: [id])
+  status        String   @default("SCHEDULED") // SCHEDULED, SHORTLISTED, REJECTED
+  feedback      String?
+  scheduledAt   DateTime?
+
+  @@unique([roundId, applicationId])
+}
+
+model Alumni {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  rollNumber      String
+  branch          String
+  batch           Int
+  graduationYear  Int
+  currentCompany  String?
+  currentRole     String?
+  location        String?
+  linkedin        String?
+  skills          String?  // JSON
+  bio             String?
+  offersmentoring Boolean  @default(false)
+  mentoringAreas  String?  // JSON
+  availability    String?
+  isVerified      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  mentorRequests  MentorshipRequest[] @relation("AlumniMentors")
+  donations       Donation[]
+}
+
+model MentorshipRequest {
+  id          String   @id @default(cuid())
+  alumniId    String
+  alumni      Alumni   @relation("AlumniMentors", fields: [alumniId], references: [id])
+  studentId   String
+  student     Student  @relation("StudentRequests", fields: [studentId], references: [id])
+  message     String
+  status      String   @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  areas       String?
+  respondedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  sessions    MentorSession[]
+}
+
+model MentorSession {
+  id          String   @id @default(cuid())
+  requestId   String
+  request     MentorshipRequest @relation(fields: [requestId], references: [id])
+  scheduledAt DateTime
+  notes       String?
+  status      String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  createdAt   DateTime @default(now())
+}
+
+model Donation {
+  id            String   @id @default(cuid())
+  alumniId      String
+  alumni        Alumni   @relation(fields: [alumniId], references: [id])
+  amount        Float
+  purpose       String
+  campaignId    String?
+  campaign      DonationCampaign? @relation(fields: [campaignId], references: [id])
+  paymentMode   String   // ONLINE, CHEQUE, DD, CASH
+  date          DateTime @default(now())
+  receiptNumber String   @unique
+  isPledge      Boolean  @default(false)
+  notes         String?
+}
+
+model DonationCampaign {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  goalAmount   Float
+  raisedAmount Float    @default(0)
+  startDate    DateTime
+  endDate      DateTime
+  status       String   @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  createdAt    DateTime @default(now())
+
+  donations    Donation[]
+}
+
+model ParsedResume {
+  id          String   @id @default(cuid())
+  studentId   String   @unique
+  student     Student  @relation(fields: [studentId], references: [id])
+  rawText     String?
+  name        String?
+  email       String?
+  phone       String?
+  skills      String?  // JSON
+  education   String?  // JSON
+  experience  String?  // JSON
+  parsedAt    DateTime @default(now())
+  isConfirmed Boolean  @default(false)
+}

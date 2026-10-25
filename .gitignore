@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Database (will be created fresh on deploy)
+server/prisma/dev.db
+server/prisma/dev.db-journal
+server/prisma/*.db
+
+# Environment
+server/.env
+.env
+
+# Uploads (user files)
+server/uploads/
+
+# Build output
+client/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
