@@ -14,7 +14,7 @@ export default function OverdueList() {
   const fetchOverdue = useCallback(() => {
     setLoading(true);
     api.get('/library/issues/overdue').then(res => {
-      setIssues(res.data.issues || res.data || []);
+      setIssues(Array.isArray(res.data) ? res.data : (res.data.data || res.data.issues || []));
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 

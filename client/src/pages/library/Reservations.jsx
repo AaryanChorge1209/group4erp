@@ -22,8 +22,9 @@ export default function Reservations() {
     setLoading(true);
     const params = new URLSearchParams({ page, pageSize, ...(search && { q: search }), ...(statusFilter && { status: statusFilter }) });
     api.get(`/library/reservations?${params}`).then(res => {
-      setReservations(res.data.reservations || res.data || []);
-      setTotal(res.data.total || 0);
+      const list = res.data.data || res.data.reservations || (Array.isArray(res.data) ? res.data : []);
+      setReservations(list);
+      setTotal(res.data.total ?? res.data.pagination?.total ?? list.length);
     }).catch(console.error).finally(() => setLoading(false));
   }, [page, pageSize, search, statusFilter]);
 

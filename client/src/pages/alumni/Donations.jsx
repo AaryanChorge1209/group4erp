@@ -48,14 +48,18 @@ export function Donations() {
         api.get('/donations')
       ]);
 
-      setCampaigns(campRes.data || []);
-      setLeaderboard(leadRes.data || []);
+      const campList = campRes.data.data || campRes.data || [];
+      setCampaigns(Array.isArray(campList) ? campList : []);
+      const leadList = leadRes.data.data || leadRes.data || [];
+      setLeaderboard(Array.isArray(leadList) ? leadList : []);
 
       const all = donRes.data.data || donRes.data || [];
-      if (user?.alumni?.id) {
-        setMyDonations(all.filter((d) => d.alumniId === user.alumni.id));
+      const safeAll = Array.isArray(all) ? all : [];
+      const aid = user?.alumni?.id || user?.alumniId;
+      if (aid) {
+        setMyDonations(safeAll.filter((d) => d.alumniId === aid));
       } else {
-        setMyDonations(all);
+        setMyDonations(safeAll);
       }
     } catch {
       toast.error('Failed to load donation campaigns and giving leaderboard');

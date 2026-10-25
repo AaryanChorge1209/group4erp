@@ -42,9 +42,10 @@ export function Applications() {
     try {
       setLoading(true);
       let list = [];
-      if (isStudent && user?.student?.id) {
-        const res = await api.get(`/placement/applications/student/${user.student.id}`);
-        list = res.data || [];
+      const sid = user?.student?.id || user?.studentId;
+      if (isStudent && sid) {
+        const res = await api.get(`/placement/applications/student/${sid}`);
+        list = res.data.data || res.data || [];
       } else {
         const params = {
           status: statusFilter !== 'ALL' ? statusFilter : undefined,
@@ -54,6 +55,7 @@ export function Applications() {
         list = res.data.data || res.data || [];
       }
 
+      if (!Array.isArray(list)) list = [];
       if (statusFilter !== 'ALL') {
         list = list.filter((a) => a.status === statusFilter);
       }

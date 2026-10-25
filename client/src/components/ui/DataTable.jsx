@@ -47,7 +47,14 @@ export default function DataTable({
   onPrint,
   title,
   searchValue,
+  pagination,
 }) {
+  const effectivePage = pagination?.page ?? page;
+  const effectivePageSize = pagination?.pageSize ?? pageSize;
+  const effectiveTotal = pagination?.total ?? total;
+  const effectiveOnPageChange = pagination?.onPageChange ?? onPageChange;
+  const effectiveOnPageSizeChange = pagination?.onPageSizeChange ?? onPageSizeChange;
+
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState('asc');
 
@@ -57,7 +64,7 @@ export default function DataTable({
     else { setSortCol(col.key); setSortDir('asc'); }
   };
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = Math.max(1, Math.ceil(effectiveTotal / effectivePageSize));
 
   const sortedData = [...data].sort((a, b) => {
     if (!sortCol) return 0;
@@ -69,7 +76,7 @@ export default function DataTable({
 
   const pageNumbers = [];
   const delta = 1;
-  for (let i = Math.max(1, page - delta); i <= Math.min(totalPages, page + delta); i++) {
+  for (let i = Math.max(1, effectivePage - delta); i <= Math.min(totalPages, effectivePage + delta); i++) {
     pageNumbers.push(i);
   }
 
@@ -101,11 +108,11 @@ export default function DataTable({
               <Printer className="w-3.5 h-3.5" /> Print
             </button>
           )}
-          {onPageSizeChange && (
+          {effectiveOnPageSizeChange && (
             <select
               className="select h-9 text-sm w-auto px-2 pr-7"
-              value={pageSize}
-              onChange={e => onPageSizeChange(Number(e.target.value))}
+              value={effectivePageSize}
+              onChange={e => effectiveOnPageSizeChange(Number(e.target.value))}
             >
               {[10, 25, 50, 100].map(n => <option key={n} value={n}>{n} / page</option>)}
             </select>
@@ -143,7 +150,7 @@ export default function DataTable({
           </thead>
           <tbody>
             {loading ? (
-              <Skeleton rows={pageSize > 10 ? 10 : pageSize} cols={columns.length} />
+              <Skeleton rows={effectivePageSize > 10 ? 10 : effectivePageSize} cols={columns.length} />
             ) : sortedData.length === 0 ? (
               <EmptyRow cols={columns.length} />
             ) : (
@@ -162,33 +169,33 @@ export default function DataTable({
       </div>
 
       {/* Pagination */}
-      {onPageChange && (
+      {effectiveOnPageChange && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-slate-700 text-sm">
           <span className="text-gray-500 dark:text-gray-400">
-            {total > 0 ? `Showing ${Math.min((page - 1) * pageSize + 1, total)}–${Math.min(page * pageSize, total)} of ${total}` : 'No records'}
+            {effectiveTotal > 0 ? `Showing ${Math.min((effectivePage - 1) * effectivePageSize + 1, effectiveTotal)}–${Math.min(effectivePage * effectivePageSize, effectiveTotal)} of ${effectiveTotal}` : 'No records'}
           </span>
           <div className="flex items-center gap-1">
-            <button onClick={() => onPageChange(1)} disabled={page === 1} className="btn-icon btn-ghost btn-sm" title="First">
+            <button onClick={() => effectiveOnPageChange(1)} disabled={effectivePage === 1} className="btn-icon btn-ghost btn-sm" title="First">
               <ChevronsLeft className="w-4 h-4" />
             </button>
-            <button onClick={() => onPageChange(page - 1)} disabled={page === 1} className="btn-icon btn-ghost btn-sm" title="Previous">
+            <button onClick={() => effectiveOnPageChange(effectivePage - 1)} disabled={effectivePage === 1} className="btn-icon btn-ghost btn-sm" title="Previous">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            {page > 2 && <span className="px-2 text-gray-400">...</span>}
+            {effectivePage > 2 && <span className="px-2 text-gray-400">...</span>}
             {pageNumbers.map(n => (
               <button
                 key={n}
-                onClick={() => onPageChange(n)}
-                className={`w-8 h-8 rounded text-sm font-medium ${n === page ? 'bg-primary-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                onClick={() => effectiveOnPageChange(n)}
+                className={`w-8 h-8 rounded text-sm font-medium ${n === effectivePage ? 'bg-primary-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
               >
                 {n}
               </button>
             ))}
-            {page < totalPages - 1 && <span className="px-2 text-gray-400">...</span>}
-            <button onClick={() => onPageChange(page + 1)} disabled={page === totalPages} className="btn-icon btn-ghost btn-sm" title="Next">
+            {effectivePage < totalPages - 1 && <span className="px-2 text-gray-400">...</span>}
+            <button onClick={() => effectiveOnPageChange(effectivePage + 1)} disabled={effectivePage === totalPages} className="btn-icon btn-ghost btn-sm" title="Next">
               <ChevronRight className="w-4 h-4" />
             </button>
-            <button onClick={() => onPageChange(totalPages)} disabled={page === totalPages} className="btn-icon btn-ghost btn-sm" title="Last">
+            <button onClick={() => effectiveOnPageChange(totalPages)} disabled={effectivePage === totalPages} className="btn-icon btn-ghost btn-sm" title="Last">
               <ChevronsRight className="w-4 h-4" />
             </button>
           </div>

@@ -14,14 +14,18 @@ export default function AlumniDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/donations/campaigns'),
-      api.get('/mentorship/requests/student/' + (user?.alumniId || 'me')),
-    ]).then(([cRes, rRes]) => {
-      setCampaigns(cRes.data.campaigns || cRes.data || []);
-      setRequests(rRes.data.requests || rRes.data || []);
-    }).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+    api.get('/auth/me').then(meRes => {
+      const u = meRes.data.user || user;
+      const alumniId = u?.alumni?.id || u?.alumniId;
+      Promise.all([
+        api.get('/donations/campaigns'),
+        alumniId ? api.get(`/mentorship/requests/alumni/${alumniId}`) : Promise.resolve({ data: [] }),
+      ]).then(([cRes, rRes]) => {
+        setCampaigns(cRes.data.data || cRes.data.campaigns || (Array.isArray(cRes.data) ? cRes.data : []));
+        setRequests(Array.isArray(rRes.data) ? rRes.data : (rRes.data.data || rRes.data.requests || []));
+      }).catch(console.error).finally(() => setLoading(false));
+    }).catch(() => setLoading(false));
+  }, [user]);
 
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 animate-spin text-primary-600" /></div>;
 

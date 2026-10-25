@@ -89,11 +89,23 @@ export default function FineManagement() {
   const fetchFines = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams({ page, pageSize, ...(search && { q: search }), ...(tab && { status: tab }) });
-    api.get(`/library/fines?${params}`).then(res => {
+    Promise.all([
+      api.get(`/library/fines?${params}`),
+      api.get('/library/fines/report')
+    ]).then(([res, repRes]) => {
       const data = res.data;
-      setFines(data.fines || data || []);
-      setTotal(data.total || 0);
-      setStats(data.stats || { total: 0, paid: 0, pending: 0, waived: 0 });
+      const list = data.data || data.fines || (Array.isArray(data) ? data : []);
+      setFines(list);
+      setTotal(data.pagination?.total ?? data.total ?? list.length);
+      if (repRes.data?.summary) {
+        const s = repRes.data.summary;
+        setStats({
+          total: (s.totalCollected || 0) + (s.totalPending || 0) + (s.totalWaived || 0),
+          paid: s.totalCollected || 0,
+          pending: s.totalPending || 0,
+          waived: s.totalWaived || 0
+        });
+      }
     }).catch(console.error).finally(() => setLoading(false));
   }, [page, pageSize, search, tab]);
 

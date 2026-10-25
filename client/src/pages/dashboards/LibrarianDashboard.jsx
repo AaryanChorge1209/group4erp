@@ -22,8 +22,8 @@ export default function LibrarianDashboard() {
       api.get('/library/issues?limit=5&sort=desc'),
     ]).then(([sRes, oRes, iRes]) => {
       setStats(sRes.data);
-      setOverdue(oRes.data.issues || oRes.data || []);
-      setRecentIssues(iRes.data.issues || iRes.data || []);
+      setOverdue(Array.isArray(oRes.data) ? oRes.data : (oRes.data.data || []));
+      setRecentIssues(iRes.data.data || []);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 

@@ -21,7 +21,7 @@ export default function AdminDashboard() {
     ]).then(([libRes, plRes, logRes]) => {
       setLibStats(libRes.data);
       setPlacementStats(plRes.data);
-      setAuditLogs(logRes.data.logs || []);
+      setAuditLogs(logRes.data.data || []);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 

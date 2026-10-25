@@ -62,7 +62,8 @@ export function Drives() {
         isOfficerOrAdmin ? api.get('/placement/companies') : Promise.resolve({ data: [] })
       ]);
 
-      let list = drivesRes.data || [];
+      let list = drivesRes.data.data || drivesRes.data.drives || (Array.isArray(drivesRes.data) ? drivesRes.data : []);
+      if (!Array.isArray(list)) list = [];
       if (search.trim()) {
         const q = search.toLowerCase();
         list = list.filter(
@@ -72,11 +73,13 @@ export function Drives() {
         );
       }
       setDrives(list);
-      setCompanies(compRes.data.data || compRes.data || []);
+      setCompanies(compRes.data.data || compRes.data || (Array.isArray(compRes.data) ? compRes.data : []));
 
-      if (isStudent && user?.student?.id) {
-        const appsRes = await api.get(`/placement/applications/student/${user.student.id}`);
-        setStudentApplications(appsRes.data || []);
+      const sid = user?.student?.id || user?.studentId;
+      if (isStudent && sid) {
+        const appsRes = await api.get(`/placement/applications/student/${sid}`);
+        const appList = appsRes.data.data || appsRes.data || [];
+        setStudentApplications(Array.isArray(appList) ? appList : []);
       }
     } catch {
       toast.error('Failed to load placement drives');

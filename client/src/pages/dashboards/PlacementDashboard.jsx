@@ -20,7 +20,7 @@ export default function PlacementDashboard() {
       api.get('/placement/drives?status=UPCOMING&limit=6'),
     ]).then(([sRes, dRes]) => {
       setStats(sRes.data);
-      setDrives(dRes.data.drives || dRes.data || []);
+      setDrives(dRes.data.data || dRes.data.drives || dRes.data || []);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 

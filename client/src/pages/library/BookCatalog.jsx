@@ -86,8 +86,9 @@ export default function BookCatalog() {
     setLoading(true);
     const params = new URLSearchParams({ page, pageSize, ...(search && { q: search }), ...(categoryFilter && { category: categoryFilter }), ...(availFilter && { available: availFilter }) });
     api.get(`/library/books?${params}`).then(res => {
-      setBooks(res.data.books || res.data || []);
-      setTotal(res.data.total || (res.data || []).length);
+      const list = res.data.data || res.data.books || (Array.isArray(res.data) ? res.data : []);
+      setBooks(list);
+      setTotal(res.data.pagination?.total ?? res.data.total ?? list.length);
     }).catch(console.error).finally(() => setLoading(false));
   }, [page, pageSize, search, categoryFilter, availFilter]);
 

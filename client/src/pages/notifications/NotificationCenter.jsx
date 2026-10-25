@@ -18,7 +18,8 @@ export default function NotificationCenter() {
 
   const fetchNotifications = () => {
     api.get('/notifications?limit=50').then(res => {
-      setNotifications(res.data.notifications || res.data || []);
+      const list = res.data.data || res.data.notifications || (Array.isArray(res.data) ? res.data : []);
+      setNotifications(Array.isArray(list) ? list : []);
     }).catch(console.error).finally(() => setLoading(false));
   };
 

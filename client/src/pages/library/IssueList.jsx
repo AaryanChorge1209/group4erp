@@ -24,8 +24,9 @@ export default function IssueList() {
     setLoading(true);
     const params = new URLSearchParams({ page, pageSize, ...(search && { q: search }), ...(statusTab && { status: statusTab }) });
     api.get(`/library/issues?${params}`).then(res => {
-      setIssues(res.data.issues || res.data || []);
-      setTotal(res.data.total || 0);
+      const list = res.data.data || res.data.issues || (Array.isArray(res.data) ? res.data : []);
+      setIssues(list);
+      setTotal(res.data.pagination?.total ?? res.data.total ?? list.length);
     }).catch(console.error).finally(() => setLoading(false));
   }, [page, pageSize, search, statusTab]);
 

@@ -72,8 +72,9 @@ export default function Companies() {
     setLoading(true);
     const params = new URLSearchParams({ page, pageSize, ...(search && { q: search }), ...(statusFilter && { status: statusFilter }) });
     api.get(`/placement/companies?${params}`).then(res => {
-      setCompanies(res.data.companies || res.data || []);
-      setTotal(res.data.total || 0);
+      const list = res.data.data || res.data.companies || (Array.isArray(res.data) ? res.data : []);
+      setCompanies(list);
+      setTotal(res.data.pagination?.total ?? res.data.total ?? list.length);
     }).catch(console.error).finally(() => setLoading(false));
   }, [page, pageSize, search, statusFilter]);
 

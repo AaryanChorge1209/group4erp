@@ -13,23 +13,26 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.studentId) { setLoading(false); return; }
-    const sid = user.studentId;
-    Promise.all([
-      api.get(`/students/${sid}/issued-books`),
-      api.get(`/students/${sid}/fines`),
-      api.get(`/students/${sid}/reservations`),
-      api.get(`/students/${sid}/applications`),
-      api.get('/placement/drives?status=UPCOMING&limit=5'),
-    ]).then(([bRes, fRes, rRes, aRes, dRes]) => {
-      setData({
-        books: bRes.data.issues || bRes.data || [],
-        fines: fRes.data || {},
-        reservations: rRes.data.reservations || rRes.data || [],
-        applications: aRes.data.applications || aRes.data || [],
-        drives: dRes.data.drives || dRes.data || [],
-      });
-    }).catch(console.error).finally(() => setLoading(false));
+    // First get fresh user profile to get studentId (may not be in localStorage token)
+    api.get('/auth/me').then(meRes => {
+      const sid = meRes.data.user?.studentId || meRes.data.user?.student?.id || user?.studentId;
+      if (!sid) { setLoading(false); return; }
+      Promise.all([
+        api.get(`/students/${sid}/issued-books`),
+        api.get(`/students/${sid}/fines`),
+        api.get(`/students/${sid}/reservations`),
+        api.get(`/students/${sid}/applications`),
+        api.get('/placement/drives?status=UPCOMING&limit=5'),
+      ]).then(([bRes, fRes, rRes, aRes, dRes]) => {
+        setData({
+          books: bRes.data.data || bRes.data.issues || bRes.data || [],
+          fines: fRes.data || {},
+          reservations: rRes.data.data || rRes.data.reservations || rRes.data || [],
+          applications: aRes.data.data || aRes.data.applications || aRes.data || [],
+          drives: dRes.data.data || dRes.data.drives || dRes.data || [],
+        });
+      }).catch(console.error).finally(() => setLoading(false));
+    }).catch(() => setLoading(false));
   }, [user]);
 
   const overdueBooks = data.books.filter(b => new Date(b.dueDate) < new Date());

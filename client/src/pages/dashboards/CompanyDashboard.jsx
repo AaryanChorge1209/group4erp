@@ -15,7 +15,7 @@ export default function CompanyDashboard() {
 
   useEffect(() => {
     api.get('/placement/drives').then(res => {
-      const myDrives = res.data.drives || res.data || [];
+      const myDrives = res.data.data || res.data.drives || (Array.isArray(res.data) ? res.data : []);
       setDrives(myDrives);
       const applicants = myDrives.reduce((a, d) => a + (d._count?.applications || 0), 0);
       setStats({ drives: myDrives.length, applicants, shortlisted: 0, selected: 0 });

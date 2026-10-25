@@ -46,14 +46,19 @@ export function Mentorship() {
     try {
       setLoading(true);
       const mentorsRes = await api.get('/mentorship/mentors');
-      setMentors(mentorsRes.data || []);
+      const mList = mentorsRes.data.data || mentorsRes.data || [];
+      setMentors(Array.isArray(mList) ? mList : []);
 
-      if (isAlumni && user?.alumni?.id) {
-        const reqRes = await api.get(`/mentorship/requests/alumni/${user.alumni.id}`);
-        setMyRequests(reqRes.data || []);
-      } else if (isStudent && user?.student?.id) {
-        const reqRes = await api.get(`/mentorship/requests/student/${user.student.id}`);
-        setMyRequests(reqRes.data || []);
+      const aid = user?.alumni?.id || user?.alumniId;
+      const sid = user?.student?.id || user?.studentId;
+      if (isAlumni && aid) {
+        const reqRes = await api.get(`/mentorship/requests/alumni/${aid}`);
+        const rList = reqRes.data.data || reqRes.data || [];
+        setMyRequests(Array.isArray(rList) ? rList : []);
+      } else if (isStudent && sid) {
+        const reqRes = await api.get(`/mentorship/requests/student/${sid}`);
+        const rList = reqRes.data.data || reqRes.data || [];
+        setMyRequests(Array.isArray(rList) ? rList : []);
       }
     } catch {
       toast.error('Failed to load mentorship hub data');

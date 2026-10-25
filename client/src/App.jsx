@@ -296,9 +296,9 @@ export function App() {
                 }
               />
               <Route path="alumni/directory" element={<AlumniDirectory />} />
-              <Route path="alumni/:id" element={<AlumniDetail />} />
               <Route path="alumni/mentorship" element={<Mentorship />} />
               <Route path="alumni/donations" element={<Donations />} />
+              <Route path="alumni/:id" element={<AlumniDetail />} />
 
               {/* Shared Routes */}
               <Route path="notifications" element={<NotificationCenter />} />
