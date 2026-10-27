@@ -17,6 +17,7 @@ function ReturnResultCard({ result }) {
       </div>
     </div>
   );
+  const issue = result.issue || result;
   return (
     <div className={`card p-5 ${result.fine ? 'border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20' : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'}`}>
       <div className="flex items-center gap-3 mb-4">
@@ -31,10 +32,10 @@ function ReturnResultCard({ result }) {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 text-sm">
-        <div><p className="text-gray-500 dark:text-gray-400">Student</p><p className="font-semibold text-gray-800 dark:text-gray-200">{result.issue?.student?.user?.name}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Roll No</p><p className="font-mono font-semibold text-gray-800 dark:text-gray-200">{result.issue?.student?.rollNumber}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Book</p><p className="font-semibold text-gray-800 dark:text-gray-200">{result.issue?.bookCopy?.book?.title}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Returned On</p><p className="font-semibold text-gray-800 dark:text-gray-200">{formatDate(result.issue?.returnedAt)}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Student</p><p className="font-semibold text-gray-800 dark:text-gray-200">{issue?.student?.user?.name || 'Student'}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Roll No</p><p className="font-mono font-semibold text-gray-800 dark:text-gray-200">{issue?.student?.rollNumber || '—'}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Book</p><p className="font-semibold text-gray-800 dark:text-gray-200">{issue?.bookCopy?.book?.title || 'Book'}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Returned On</p><p className="font-semibold text-gray-800 dark:text-gray-200">{formatDate(issue?.returnedAt || new Date())}</p></div>
         {result.fine && (
           <>
             <div><p className="text-gray-500 dark:text-gray-400">Days Overdue</p><p className="font-semibold text-red-600">{result.fine.daysOverdue} days</p></div>
@@ -61,8 +62,9 @@ export default function Return() {
   const [recentReturns, setRecentReturns] = useState([]);
 
   const fetchRecent = () => {
-    api.get('/library/issues?returned=true&limit=8').then(res => {
-      setRecentReturns(res.data.issues || res.data || []);
+    api.get('/library/issues?status=returned&limit=8').then(res => {
+      const list = res.data.data || res.data.issues || (Array.isArray(res.data) ? res.data : []);
+      setRecentReturns(Array.isArray(list) ? list : []);
     }).catch(() => {});
   };
 

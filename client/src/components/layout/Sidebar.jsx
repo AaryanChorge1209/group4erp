@@ -21,7 +21,8 @@ const NAV_CONFIG = {
     { label: 'LIBRARY', items: [
       { to: '/library/dashboard', icon: BookOpen, label: 'Library Dashboard' },
       { to: '/library/books', icon: BookMarked, label: 'Book Catalog' },
-      { to: '/library/checkout', icon: ArrowRightLeft, label: 'Checkout / Return' },
+      { to: '/library/checkout', icon: BookUp, label: 'Checkout Book' },
+      { to: '/library/return', icon: ArrowRightLeft, label: 'Return Book' },
       { to: '/library/issues', icon: List, label: 'Issue Tracking' },
       { to: '/library/overdue', icon: AlertTriangle, label: 'Overdue' },
       { to: '/library/fines', icon: DollarSign, label: 'Fine Management' },
@@ -69,6 +70,9 @@ const NAV_CONFIG = {
       { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     ]},
     { label: 'LIBRARY', items: [
+      { to: '/library/books', icon: BookMarked, label: 'Book Catalog' },
+      { to: '/library/checkout', icon: BookUp, label: 'Book Checkout' },
+      { to: '/library/return', icon: ArrowRightLeft, label: 'Book Return' },
       { to: '/library/opac', icon: Search, label: 'Search Books (OPAC)' },
       { to: '/library/digital', icon: Database, label: 'Digital Library' },
       { to: '/student/books', icon: BookMarked, label: 'My Books' },
@@ -160,7 +164,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <BookOpen className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
-            <p className="text-white font-bold text-sm leading-tight">VVIT ERP</p>
+            <p className="text-white font-bold text-sm leading-tight">Kirti College ERP</p>
             <p className="text-slate-400 text-xs truncate">College Management</p>
           </div>
           <button onClick={onClose} className="ml-auto text-slate-400 hover:text-white lg:hidden">

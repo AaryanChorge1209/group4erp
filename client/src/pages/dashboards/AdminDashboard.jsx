@@ -47,7 +47,7 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="page-title">Admin Dashboard</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">VVIT College of Engineering — Academic Year 2024-25</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Kirti M Doongursee College of Arts, Science & Commerce — Academic Year 2024-25</p>
       </div>
 
       {/* KPIs */}

@@ -187,7 +187,7 @@ export function App() {
               <Route
                 path="library/checkout"
                 element={
-                  <ProtectedRoute roles={['LIBRARIAN', 'ADMIN']}>
+                  <ProtectedRoute>
                     <Checkout />
                   </ProtectedRoute>
                 }
@@ -195,7 +195,7 @@ export function App() {
               <Route
                 path="library/return"
                 element={
-                  <ProtectedRoute roles={['LIBRARIAN', 'ADMIN']}>
+                  <ProtectedRoute>
                     <Return />
                   </ProtectedRoute>
                 }
@@ -252,6 +252,10 @@ export function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="student/books" element={<IssueList />} />
+              <Route path="student/fines" element={<FineManagement />} />
+              <Route path="student/reservations" element={<Reservations />} />
+              <Route path="student/applications" element={<Applications />} />
 
               {/* Placement Routes */}
               <Route

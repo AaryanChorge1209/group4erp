@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Scan, User, BookOpen, CheckCircle, AlertTriangle, Loader2, Clock } from 'lucide-react';
 import { formatDate, formatCurrency } from '../../lib/utils';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
 
@@ -17,6 +18,7 @@ function ResultCard({ result }) {
       </div>
     </div>
   );
+  const issue = result.issue || result;
   return (
     <div className="card p-5 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
       <div className="flex items-center gap-3 mb-4">
@@ -27,28 +29,36 @@ function ResultCard({ result }) {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 text-sm">
-        <div><p className="text-gray-500 dark:text-gray-400">Student</p><p className="font-semibold text-gray-800 dark:text-gray-200">{result.issue?.student?.user?.name}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Roll No</p><p className="font-semibold text-gray-800 dark:text-gray-200">{result.issue?.student?.rollNumber}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Book Title</p><p className="font-semibold text-gray-800 dark:text-gray-200">{result.issue?.bookCopy?.book?.title}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Barcode</p><p className="font-mono font-semibold text-gray-800 dark:text-gray-200">{result.issue?.bookCopy?.barcode}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Issued Date</p><p className="font-semibold text-gray-800 dark:text-gray-200">{formatDate(result.issue?.issuedAt)}</p></div>
-        <div><p className="text-gray-500 dark:text-gray-400">Due Date</p><p className="font-semibold text-amber-600 dark:text-amber-400">{formatDate(result.issue?.dueDate)}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Student</p><p className="font-semibold text-gray-800 dark:text-gray-200">{issue?.student?.user?.name}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Roll No</p><p className="font-semibold text-gray-800 dark:text-gray-200">{issue?.student?.rollNumber}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Book Title</p><p className="font-semibold text-gray-800 dark:text-gray-200">{issue?.bookCopy?.book?.title}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Barcode</p><p className="font-mono font-semibold text-gray-800 dark:text-gray-200">{issue?.bookCopy?.barcode}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Issued Date</p><p className="font-semibold text-gray-800 dark:text-gray-200">{formatDate(issue?.issuedAt)}</p></div>
+        <div><p className="text-gray-500 dark:text-gray-400">Due Date</p><p className="font-semibold text-amber-600 dark:text-amber-400">{formatDate(issue?.dueDate)}</p></div>
       </div>
     </div>
   );
 }
 
 export default function Checkout() {
-  const [studentId, setStudentId] = useState('');
+  const { user } = useAuth();
+  const [studentId, setStudentId] = useState(user?.student?.rollNumber || user?.student?.id || '');
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [recentIssues, setRecentIssues] = useState([]);
   const barcodeRef = useRef(null);
 
+  useEffect(() => {
+    if ((user?.student?.rollNumber || user?.student?.id) && !studentId) {
+      setStudentId(user.student?.rollNumber || user.student?.id);
+    }
+  }, [user]);
+
   const fetchRecent = () => {
     api.get('/library/issues?limit=8&sort=desc').then(res => {
-      setRecentIssues(res.data.issues || res.data || []);
+      const list = res.data.data || res.data.issues || (Array.isArray(res.data) ? res.data : []);
+      setRecentIssues(Array.isArray(list) ? list : []);
     }).catch(() => {});
   };
 
@@ -56,11 +66,13 @@ export default function Checkout() {
 
   const handleCheckout = async (e) => {
     e.preventDefault();
-    if (!studentId.trim() || !barcode.trim()) { toast.error('Please enter both Student ID and Book Barcode'); return; }
+    const effectiveStudentId = studentId.trim() || user?.student?.rollNumber || user?.student?.id;
+    if (!effectiveStudentId) { toast.error('Please enter Student ID or Roll Number'); return; }
+    if (!barcode.trim()) { toast.error('Please enter Book Barcode'); return; }
     setLoading(true);
     setResult(null);
     try {
-      const res = await api.post('/library/issues/checkout', { studentId: studentId.trim(), barcode: barcode.trim() });
+      const res = await api.post('/library/issues/checkout', { studentId: effectiveStudentId, barcode: barcode.trim() });
       setResult(res.data);
       toast.success('Book checked out successfully!');
       setBarcode('');

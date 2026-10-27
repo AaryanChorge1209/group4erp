@@ -9,10 +9,8 @@ router.use(authenticate);
 
 router.post(
   '/checkout',
-  requireRole('ADMIN', 'LIBRARIAN'),
   [
-    body('barcode').notEmpty().withMessage('Barcode is required'),
-    body('studentId').notEmpty().withMessage('Student ID is required')
+    body('barcode').notEmpty().withMessage('Barcode is required')
   ],
   validate,
   issuesController.checkoutBook
@@ -20,13 +18,12 @@ router.post(
 
 router.post(
   '/return',
-  requireRole('ADMIN', 'LIBRARIAN'),
   [body('barcode').notEmpty().withMessage('Barcode is required')],
   validate,
   issuesController.returnBook
 );
 
-router.get('/overdue', requireRole('ADMIN', 'LIBRARIAN'), issuesController.getOverdueIssues);
+router.get('/overdue', issuesController.getOverdueIssues);
 router.get('/', issuesController.getIssues);
 router.get('/:id', issuesController.getIssueById);
 

@@ -77,7 +77,7 @@ export default function Login() {
               <BookOpen className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-white text-2xl font-bold">VVIT ERP</h1>
+              <h1 className="text-white text-2xl font-bold">Kirti College ERP</h1>
               <p className="text-slate-400 text-sm">College Management System</p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Login() {
               <span className="text-primary-400">In One Place.</span>
             </h2>
             <p className="text-slate-300 text-lg leading-relaxed">
-              VVIT College of Engineering's integrated platform for library management, placements, and alumni relations.
+              Kirti M Doongursee College of Arts, Science & Commerce's integrated platform for library management, placements, and alumni relations.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export default function Login() {
         </div>
 
         <p className="relative z-10 text-slate-500 text-sm">
-          © 2024 VVIT College of Engineering. All rights reserved.
+          © 2024 Kirti M Doongursee College of Arts, Science & Commerce. All rights reserved.
         </p>
       </div>
 
@@ -122,8 +122,8 @@ export default function Login() {
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="font-bold text-gray-900 dark:text-white">VVIT ERP</p>
-              <p className="text-xs text-gray-500">VVIT College of Engineering</p>
+              <p className="font-bold text-gray-900 dark:text-white">Kirti College ERP</p>
+              <p className="text-xs text-gray-500">Kirti M Doongursee College of Arts, Science & Commerce</p>
             </div>
           </div>
 

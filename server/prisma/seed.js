@@ -38,7 +38,7 @@ async function main() {
   const settings = [
     { key: 'loanPeriodDays', value: '14' },
     { key: 'finePerDay', value: '2' },
-    { key: 'collegeName', value: 'VVIT College of Engineering' },
+    { key: 'collegeName', value: 'Kirti M Doongursee College of Arts, Science & Commerce' },
     { key: 'academicYear', value: '2024-25' }
   ];
   for (const s of settings) {
@@ -776,7 +776,7 @@ async function main() {
       email: 'student@erp.edu',
       phone: '+91 98765 43210',
       skills: JSON.stringify(['JavaScript', 'TypeScript', 'React', 'Node.js', 'Express', 'Python', 'SQL', 'Git', 'Docker']),
-      education: JSON.stringify(['B.Tech in Computer Science - VVIT (2022-2026, CGPA: 8.85)', 'Senior Secondary (CBSE) - 94.2%']),
+      education: JSON.stringify(['B.Tech in Computer Science - Kirti College (2022-2026, CGPA: 8.85)', 'Senior Secondary (CBSE) - 94.2%']),
       experience: JSON.stringify(['Web Development Intern at TechStart (May 2024 - July 2024)', 'Fullstack E-Commerce Project with React & Express']),
       isConfirmed: true,
       rawText: 'Aarav Patel | Bangalore, India | student@erp.edu | 9876543210\nEducation: B.Tech in Computer Science\nSkills: React, Node.js, Express, Python, SQL, Docker'
@@ -788,7 +788,7 @@ async function main() {
   await prisma.notification.create({
     data: {
       userId: demoStudentUser.id,
-      title: 'Welcome to VVIT Campus ERP',
+      title: 'Welcome to Kirti College ERP',
       message: 'Your student portal is fully set up. Check Library and Placement modules.',
       type: 'INFO',
       link: '/dashboard'

@@ -22,7 +22,7 @@ function ReceiptModal({ open, onClose, fine }) {
     <Modal open={open} onClose={onClose} title="Fine Receipt" size="md">
       <div className="text-center border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 space-y-4" id="fine-receipt">
         <div className="border-b border-gray-200 dark:border-slate-700 pb-4">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">VVIT College of Engineering</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Kirti M Doongursee College of Arts, Science & Commerce</h2>
           <p className="text-sm text-gray-500">Library Fine Receipt</p>
         </div>
         <div className="flex justify-between text-sm">

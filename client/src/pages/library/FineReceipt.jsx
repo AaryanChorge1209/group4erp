@@ -21,7 +21,7 @@ export function FineReceipt({ fine, onClose }) {
       <div className="text-center pb-4 border-b-2 border-gray-900 dark:border-white">
         <div className="flex items-center justify-center gap-2 mb-1">
           <BookOpen className="w-5 h-5 text-primary-600" />
-          <h2 className="text-base font-black tracking-wide">VVIT COLLEGE OF ENGINEERING</h2>
+          <h2 className="text-base font-black tracking-wide">KIRTI M DOONGURSEE COLLEGE OF ARTS, SCIENCE & COMMERCE</h2>
         </div>
         <p className="text-xs uppercase tracking-wider text-gray-500">Central Library & Learning Resource Center</p>
         <p className="text-[11px] text-gray-400">Official Electronic Cash Receipt for Overdue Fine</p>

@@ -34,7 +34,7 @@ export default function AppLayout() {
           <Outlet />
         </div>
         <footer className="text-center text-xs text-gray-400 dark:text-gray-600 py-6 border-t border-gray-200 dark:border-slate-700 mt-8">
-          © 2024 VVIT College of Engineering — ERP v1.0.0 &nbsp;|&nbsp; All Rights Reserved
+          © 2024 Kirti M Doongursee College of Arts, Science & Commerce — ERP v1.0.0 &nbsp;|&nbsp; All Rights Reserved
         </footer>
       </main>
     </div>

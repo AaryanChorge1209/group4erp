@@ -4,8 +4,22 @@ const { calculateFine, createAuditLog, createNotification } = require('../../uti
 const checkoutBook = async (req, res) => {
   try {
     const { barcode, studentId } = req.body;
-    if (!barcode || !studentId) {
-      return res.status(400).json({ error: 'Barcode and studentId are required' });
+    if (!barcode) {
+      return res.status(400).json({ error: 'Book barcode is required' });
+    }
+
+    let targetStudentId = studentId ? String(studentId).trim() : null;
+    if (!targetStudentId && req.user) {
+      if (req.user.student?.id) {
+        targetStudentId = req.user.student.id;
+      } else if (req.user.role === 'STUDENT') {
+        const s = await prisma.student.findFirst({ where: { userId: req.user.id } });
+        if (s) targetStudentId = s.id;
+      }
+    }
+
+    if (!targetStudentId) {
+      return res.status(400).json({ error: 'Student ID or Roll Number is required' });
     }
 
     // 1. Find book copy
@@ -22,11 +36,18 @@ const checkoutBook = async (req, res) => {
 
     // 2. Find student
     const student = await prisma.student.findFirst({
-      where: { OR: [{ id: studentId }, { userId: studentId }, { rollNumber: studentId }] },
+      where: {
+        OR: [
+          { id: targetStudentId },
+          { userId: targetStudentId },
+          { rollNumber: targetStudentId },
+          { user: { email: targetStudentId.toLowerCase() } }
+        ]
+      },
       include: { user: true }
     });
     if (!student) {
-      return res.status(404).json({ error: 'Student not found' });
+      return res.status(404).json({ error: `Student "${targetStudentId}" not found in system` });
     }
 
     // 3. Check unpaid fines
@@ -93,7 +114,11 @@ const checkoutBook = async (req, res) => {
       '/library/my-books'
     );
 
-    return res.status(201).json(issue);
+    return res.status(201).json({
+      message: 'Book checked out successfully',
+      issue,
+      ...issue
+    });
   } catch (error) {
     console.error('checkoutBook error:', error);
     return res.status(500).json({ error: error.message || 'Failed to checkout book' });
@@ -148,6 +173,10 @@ const returnBook = async (req, res) => {
         data: {
           returnedAt: now,
           returnedById: req.user.id
+        },
+        include: {
+          bookCopy: { include: { book: true } },
+          student: { include: { user: true } }
         }
       });
 

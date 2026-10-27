@@ -12,10 +12,10 @@ export function Settings() {
 
   // College Details
   const [collegeDetails, setCollegeDetails] = useState({
-    collegeName: 'VVIT College of Engineering',
-    collegeCode: 'VVIT-045',
+    collegeName: 'Kirti M Doongursee College of Arts, Science & Commerce',
+    collegeCode: 'KMC-045',
     academicYear: '2024-25',
-    principalEmail: 'principal@vvit.edu'
+    principalEmail: 'principal@kirti.edu'
   });
 
   // Library Settings
